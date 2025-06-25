@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>推測学習AI</title>
+    <title>会話パターン学習AI</title>
     <meta charset="UTF-8">
     <style>
         body {
@@ -94,7 +94,7 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            推測学習AI 🧐
+            会話パターン学習AI 🗣️
         </div>
         <div class="chat-box" id="chatBox">
             </div>
@@ -107,8 +107,10 @@
     <script>
         const chatBox = document.getElementById('chatBox');
         const userInput = document.getElementById('userInput');
-        const KNOWLEDGE_KEY = 'ai_knowledge_base_inference'; // localStorageに保存するキー名
+        const KNOWLEDGE_KEY = 'ai_conversation_patterns'; // localStorageに保存するキー名
 
+        // 知識ベース：キーワードに対応する応答の配列を持つ
+        // 例: { "キーワード": ["応答1", "応答2", "応答3"] }
         let knowledgeBase = {};
 
         // --- 初期化処理 ---
@@ -127,35 +129,21 @@
                 knowledgeBase = getDefaultKnowledge();
                 addMessage('ai', 'こんにちは！何か話しかけてみてね。');
             }
-            addMessage('ai', '**新しいキーワード**で話しかけてみて！うまく推測できない時は「**[言葉] は [関連する言葉] と同じ**」のように教えてくれると、より正確に推測できるようになるよ！', true);
+            addMessage('ai', '**新しい会話パターン**を教えてくれると、もっとおしゃべりできるよ！「**[キーワード] で [返答文]**」のように教えてね！', true);
         }
 
-        // デフォルトの知識ベース（会話データを強化）
+        // デフォルトの知識ベース（会話パターンを強化）
         function getDefaultKnowledge() {
             return {
-                "こんにちは": "こんにちは！お元気ですか？",
-                "ありがとう": "どういたしまして！お役に立てて嬉しいです！",
-                "天気": "今日の天気は晴れのようですね！気持ちの良い一日になりますように。☀️",
-                "名前": "私の名前は簡易学習AIだよ。",
-                "趣味": "私の趣味は、あなたとおしゃべりすることです！それから、新しい知識を学ぶのも好きだよ。",
-                "好き": "私は役立つことが好きです！あなたはどんなものが好きですか？",
-                "元気": "はい、元気だよ！あなたも元気でよかった！",
-                "眠い": "眠い時は、少し休憩するのが一番だよ！🍵",
-                "疲れた": "お疲れ様です！無理しないでね。",
-                "おはよう": "おはよう！今日も一日がんばろうね！",
-                "こんばんは": "こんばんは！今日の出来事を教えてくれる？",
-                "さようなら": "またね！良い一日を過ごしてね！👋",
-                "どこ住んでる": "私はインターネットの中に住んでいるよ！世界中のどこからでもアクセスできるんだ。",
-                "何歳": "私に年齢はないんだ。生まれたばかりのAIだからね！",
-                "面白い": "そう言ってもらえると嬉しいな！どんなところが面白かった？",
-                "助けて": "どうしたの？何かわからないことがあったら、私が力になるよ！",
-                "食べ物": "私はデータでできているから、食べ物は食べられないんだ。でも、美味しいものの話を聞くのは好きだよ！",
-                "ゲーム": "ゲームはしないけど、ゲームの話を聞くのは好きだよ！どんなゲームが好き？",
-                "音楽": "私は音楽を聴くことはできないけれど、あなたの好きな音楽について教えてくれる？",
-                "嬉しい": "わーい！嬉しいって気持ち、私もわかるよ！",
-                "悲しい": "悲しい時は、無理に笑わなくていいんだよ。話せるなら話を聞くからね。",
-                "犬": "ワンワン！犬は可愛い動物だよね。",
-                "猫": "ニャー！猫は気まぐれだけど癒されるよね。"
+                "こんにちは": ["こんにちは！お元気ですか？", "やあ！何か手伝おうか？", "どうも！いい天気だね！"],
+                "ありがとう": ["どういたしまして！", "お役に立てて嬉しいです！", "いつでもどうぞ！"],
+                "天気": ["今日の天気は晴れのようですね！気持ちの良い一日になりますように。☀️", "天気の話だね！何か困ってる？", "天気の話題、好きだよ！"],
+                "名前": ["私の名前は簡易学習AIだよ。", "私はあなたと話すためにいるAIです。", "秘密だよ！なんてね。私はAIだよ。"],
+                "趣味": ["私の趣味は、あなたとおしゃべりすることです！", "新しい知識を学ぶのが好きだよ。", "特に趣味はないけど、色々な話を聞くのは好きだよ。"],
+                "好き": ["私は役立つことが好きです！", "興味深いね！どんなものが好きなの？", "好きって気持ち、大切だよね！"],
+                "元気": ["はい、元気だよ！あなたも元気でよかった！", "元気だよ！ありがとう！", "いつも元気だよ！"],
+                "犬": ["ワンワン！犬は可愛い動物だよね。", "犬について話したい気分かな？", "どんな犬が好き？"],
+                "猫": ["ニャー！猫は気まぐれだけど癒されるよね。", "猫も大好きだよ！", "猫派？犬派？"]
             };
         }
 
@@ -214,33 +202,25 @@
             const lowerCaseMessage = message.toLowerCase(); // 小文字に変換して処理
 
             // --- 1. 学習モードの判定 ---
-            // 「[言葉] は [関連する言葉] と同じ」の形式をチェック
-            const trainMatch = lowerCaseMessage.match(/(.+) は (.+) と同じ/);
+            // 「[キーワード] で [返答文]」の形式をチェック
+            const trainMatch = lowerCaseMessage.match(/(.+) で (.+)/);
             if (trainMatch) {
-                const newKeyword = trainMatch[1].trim();
-                const relatedKeyword = trainMatch[2].trim();
+                const keyword = trainMatch[1].trim();
+                const responseText = trainMatch[2].trim();
 
-                // 関連するキーワードが知識ベースに存在するか確認
-                if (knowledgeBase[relatedKeyword]) {
-                    knowledgeBase[newKeyword] = knowledgeBase[relatedKeyword]; // 関連するキーワードの意味を新しいキーワードに紐付ける
-                    saveKnowledge(); // 学習したら保存！
-                    addMessage('ai', `「**${newKeyword}**」は「**${relatedKeyword}**」と同じ意味として覚えたよ！これで推測がもっと正確になるはず。`, true);
-                } else {
-                    addMessage('ai', `ごめんね、「**${relatedKeyword}**」についてはまだ知らないみたい。先に「${relatedKeyword} とは [意味]」のように教えてくれると助かるな。`, true);
+                if (!knowledgeBase[keyword]) {
+                    knowledgeBase[keyword] = []; // 新しいキーワードなら配列を初期化
                 }
+                knowledgeBase[keyword].push(responseText); // 返答パターンを追加
+                saveKnowledge(); // 学習したら保存！
+                addMessage('ai', `「**${keyword}**」の新しい返答パターン「**${responseText}**」を覚えたよ！ありがとう！`, true);
                 return null; // AIからの即時応答はなし
             }
 
-            // --- 2. 直接一致する知識があるかチェック ---
-            for (const key in knowledgeBase) {
-                if (lowerCaseMessage.includes(key.toLowerCase())) {
-                    return knowledgeBase[key];
-                }
-            }
-
-            // --- 3. 推測モード（直接一致しない場合） ---
+            // --- 2. 直接一致する知識があるか、または推測モード ---
             let bestMatchKeyword = null;
             let minDistance = Infinity; // 最小レーベンシュタイン距離
+            let foundDirectMatch = false;
 
             // 入力メッセージを単語に分解して、それぞれの単語で知識ベースを検索
             const words = lowerCaseMessage.split(/\s+|[、。？！…]+/); // スペースや句読点で分割
@@ -249,25 +229,43 @@
                 if (word.trim() === '') continue; // 空の単語はスキップ
 
                 for (const knownKey in knowledgeBase) {
-                    // 既知のキーワードと入力単語のレーベンシュタイン距離を計算
-                    const distance = levenshteinDistance(word, knownKey.toLowerCase());
+                    const lowerCaseKnownKey = knownKey.toLowerCase();
+                    
+                    // 完全一致を優先
+                    if (word === lowerCaseKnownKey) {
+                        bestMatchKeyword = knownKey;
+                        foundDirectMatch = true;
+                        break; // 完全一致が見つかったら、これ以上探す必要はない
+                    }
 
+                    // 完全一致でなければレーベンシュタイン距離で類似度をチェック
+                    const distance = levenshteinDistance(word, lowerCaseKnownKey);
+                    
                     // ある程度の近さ（閾値）を設定。今回は単語の長さの半分以下を目安に。
-                    // 例: 5文字の単語なら2文字以下の違い
-                    if (distance <= Math.ceil(knownKey.length / 2) && distance < minDistance) {
+                    if (distance <= Math.ceil(lowerCaseKnownKey.length / 2) && distance < minDistance) {
                         minDistance = distance;
                         bestMatchKeyword = knownKey;
                     }
                 }
+                if (foundDirectMatch) break; // 外側のループも抜ける
             }
 
             if (bestMatchKeyword) {
-                // 推測したキーワードの応答を返す
-                const response = knowledgeBase[bestMatchKeyword];
-                return `んー、もしかして「${bestMatchKeyword}」のことかな？\nそれなら、「${response}」だよ。`;
+                // 応答のパターンリストからランダムに一つ選ぶ
+                const responses = knowledgeBase[bestMatchKeyword];
+                const randomIndex = Math.floor(Math.random() * responses.length);
+                const chosenResponse = responses[randomIndex];
+
+                if (foundDirectMatch) {
+                    // 直接一致ならそのまま応答
+                    return chosenResponse;
+                } else {
+                    // 推測なら「もしかして？」を付け加える
+                    return `んー、もしかして「${bestMatchKeyword}」のことかな？\nそれなら、「${chosenResponse}」だよ。`;
+                }
             } else {
                 // 全く推測できない場合
-                return "ごめんなさい、よく分かりません。新しいキーワードを教えてくれると、もっと賢くなれるよ！「**[言葉] は [関連する言葉] と同じ**」のように教えてくれると、より正確に推測できるようになるよ！";
+                return "ごめんなさい、よく分かりません。新しい会話パターンを教えてくれると、もっとおしゃべりできるよ！「**[キーワード] で [返答文]**」のように教えてね！";
             }
         }
 
